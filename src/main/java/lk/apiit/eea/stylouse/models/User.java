@@ -1,16 +1,16 @@
 package lk.apiit.eea.stylouse.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -27,7 +27,16 @@ public class User {
     private String lastName;
     private String phone;
     private String email;
+    @JsonIgnore
     private String password;
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date dateOfBirth;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Cart> carts = new ArrayList<>();
+
+    public void removeCart(Cart cart) {
+        cart.setUser(null);
+        this.carts.remove(cart);
+    }
 }
