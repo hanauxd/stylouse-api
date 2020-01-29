@@ -23,6 +23,11 @@ public class Orders {
     @Column(length = 36)
     private String id;
 
+    String address;
+    String city;
+    String postalCode;
+    String paymentMethod;
+
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "user", referencedColumnName = "id")
     @JsonIgnore
@@ -39,7 +44,11 @@ public class Orders {
         this.date = new Date();
     }
 
-    public Orders(User user) {
+    public Orders(User user, String address, String city, String postalCode, String paymentMethod) {
         this.user = user;
+        this.address = address;
+        this.city = city;
+        this.postalCode = postalCode;
+        this.paymentMethod = paymentMethod;
     }
 }

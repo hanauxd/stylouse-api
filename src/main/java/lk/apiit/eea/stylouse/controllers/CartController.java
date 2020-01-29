@@ -1,6 +1,7 @@
 package lk.apiit.eea.stylouse.controllers;
 
 import lk.apiit.eea.stylouse.dto.request.CartRequest;
+import lk.apiit.eea.stylouse.dto.request.ShippingDetailsRequest;
 import lk.apiit.eea.stylouse.models.Cart;
 import lk.apiit.eea.stylouse.models.Orders;
 import lk.apiit.eea.stylouse.models.User;
@@ -52,9 +53,9 @@ public class CartController {
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @PostMapping("/checkout")
-    public ResponseEntity<?> checkout(Authentication auth) {
+    public ResponseEntity<?> checkout(@RequestBody ShippingDetailsRequest request, Authentication auth) {
         User user = userService.getUserByEmail(auth.getName());
-        Orders orders = cartService.checkout(user);
+        Orders orders = cartService.checkout(user, request);
         return ResponseEntity.ok(orders);
     }
 }
