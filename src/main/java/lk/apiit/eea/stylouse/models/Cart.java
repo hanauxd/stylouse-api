@@ -1,6 +1,5 @@
 package lk.apiit.eea.stylouse.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -9,9 +8,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -24,35 +20,30 @@ public class Cart {
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(length = 36)
     private String id;
-    private String status;
-    @JsonFormat(pattern = "dd-MM-yyyy hh:MM")
-    private Date date;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "user", referencedColumnName = "id")
     @JsonIgnore
     private User user;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<CartProduct> cartProducts = new ArrayList<>();
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "product", referencedColumnName = "id")
+    @JsonIgnore
+    private Product product;
 
-    @PrePersist
-    protected void onCreate() {
-        this.date = new Date();
-        this.status = "Active";
-    }
+    private int quantity;
 
-    public void removeCartProduct(CartProduct cartProduct) {
-        cartProduct.setCart(null);
-        this.cartProducts.remove(cartProduct);
+    private String size;
+
+    public Cart(User user, Product product, int quantity, String size) {
+        this.user = user;
+        this.product = product;
+        this.quantity = quantity;
+        this.size = size;
     }
 
     @Transient
-    public double getTotalCartPrice() {
-        double sum = 0;
-        for (CartProduct cartProduct : this.cartProducts) {
-            sum += cartProduct.getTotalPrice();
-        }
-        return sum;
+    public double getTotalPrice() {
+        return quantity * product.getPrice();
     }
 }
