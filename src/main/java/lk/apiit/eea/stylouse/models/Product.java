@@ -22,7 +22,6 @@ public class Product {
     @Column(length = 36)
     private String id;
     private String name;
-    private String size;
     private int quantity;
     private double price;
 
@@ -35,10 +34,13 @@ public class Product {
     }
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<CartProduct> cartProducts = new ArrayList<>();
+    private List<Cart> carts = new ArrayList<>();
 
-    public void removeCartProduct(CartProduct cartProduct) {
-        cartProduct.setProduct(null);
-        this.cartProducts.remove(cartProduct);
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<OrderItem> orderItems = new ArrayList<>();
+
+    public void removeCart(Cart cart) {
+        cart.setProduct(null);
+        this.carts.remove(cart);
     }
 }

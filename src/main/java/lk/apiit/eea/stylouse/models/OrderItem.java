@@ -9,29 +9,34 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
-public class CartProduct {
+public class OrderItem {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(length = 36)
     private String id;
-    private int quantity;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "cart", referencedColumnName = "id")
+    @JoinColumn(name = "orders", referencedColumnName = "id")
     @JsonIgnore
-    private Cart cart;
+    private Orders orders;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "product", referencedColumnName = "id")
     @JsonIgnore
     private Product product;
 
-    @Transient
-    public double getTotalPrice() {
-        return this.product.getPrice() * this.quantity;
+    private int quantity;
+
+    private String size;
+
+    public OrderItem(Product product, int quantity, String size, Orders orders) {
+        this.product = product;
+        this.quantity = quantity;
+        this.size = size;
+        this.orders = orders;
     }
 }

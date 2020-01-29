@@ -2,90 +2,108 @@ package lk.apiit.eea.stylouse.services;
 
 import lk.apiit.eea.stylouse.dto.request.CartRequest;
 import lk.apiit.eea.stylouse.exceptions.CustomException;
-import lk.apiit.eea.stylouse.models.Cart;
-import lk.apiit.eea.stylouse.models.CartProduct;
-import lk.apiit.eea.stylouse.models.Product;
-import lk.apiit.eea.stylouse.models.User;
+import lk.apiit.eea.stylouse.models.*;
 import lk.apiit.eea.stylouse.repositories.CartRepository;
+import lk.apiit.eea.stylouse.repositories.OrdersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
 public class CartService {
     private CartRepository cartRepository;
     private ProductService productService;
-    private CartProductService cartProductService;
+    private OrdersRepository ordersRepository;
 
     @Autowired
-    public CartService(CartRepository cartRepository, ProductService productService, CartProductService cartProductService) {
+    public CartService(CartRepository cartRepository, ProductService productService, OrdersRepository ordersRepository) {
         this.cartRepository = cartRepository;
         this.productService = productService;
-        this.cartProductService = cartProductService;
+        this.ordersRepository = ordersRepository;
     }
 
-    public Cart getCartById(String id) {
-        return cartRepository.findById(id).orElseThrow(() -> new CustomException("Cart not found.", HttpStatus.NOT_FOUND));
+    public List<Cart> createOrUpdateCart(User user, CartRequest request) {
+        Product product = productService.getProductById(request.getProductId());
+        Cart persistedCart = cartRepository.findByUserAndProductAndSize(user, product, request.getSize());
+        if (persistedCart != null) {
+            persistedCart.setQuantity(request.getQuantity() + persistedCart.getQuantity());
+        } else {
+            persistedCart = new Cart(user, product, request.getQuantity(), request.getSize());
+        }
+        cartRepository.save(persistedCart);
+        return getUserCarts(user);
     }
 
-    public List<Cart> getCartsByUser(User user) {
+    public List<Cart> getUserCarts(User user) {
         return cartRepository.findByUser(user);
     }
 
-    public Cart createOrUpdateCart(List<CartRequest> requests, User user) {
-        Cart activeCart = cartRepository.findByUserAndStatus(user, "Active");
-        if (activeCart != null) {
-            if (activeCart.getCartProducts().size() > 0) {
-                for (CartRequest req : requests) {
-                    Product product = productService.getProductById(req.getProductId());
-                    CartProduct cartProduct = cartProductService.getProductByCart(activeCart, product);
-                    if (cartProduct != null) {
-                        cartProduct.setQuantity(cartProduct.getQuantity() + req.getQuantity());
-                    } else {
-                        addProducts(activeCart, product, req.getQuantity());
-                    }
-                }
-            } else {
-                for (CartRequest req : requests) {
-                    Product product = productService.getProductById(req.getProductId());
-                    addProducts(activeCart, product, req.getQuantity());
-                }
-            }
-            return cartRepository.save(activeCart);
+    public Cart getCartById(String id) {
+        return cartRepository.findById(id).orElseThrow(
+                () -> new CustomException("Cart not found", HttpStatus.NOT_FOUND)
+        );
+    }
+
+    @Transactional
+    public List<Cart> updateCart(String id, int qty, User user) {
+        if (qty < 1) {
+            throw new CustomException("The quantity must be at least 1.", HttpStatus.BAD_REQUEST);
+        }
+        Cart cart = getCartById(id);
+        int stock = cart.getProduct().getQuantity();
+        if (qty <= stock) {
+            cart.setQuantity(qty);
+            return getUserCarts(user);
         } else {
-            Cart cart = new Cart();
-            cart.setUser(user);
-            cart.setStatus("Active");
-            for (CartRequest req : requests) {
-                Product product = productService.getProductById(req.getProductId());
-                addProducts(cart, product, req.getQuantity());
-            }
-            return cartRepository.save(cart);
+            throw new CustomException("Requested quantity not available.", HttpStatus.BAD_REQUEST);
         }
     }
 
-    public void deleteCart(Cart cart) {
+    @Transactional
+    public Orders checkout(User user) {
+        List<Cart> carts = getUserCarts(user);
+        if (carts.size() > 0) {
+            return createOrder(user, carts);
+        } else {
+            throw new CustomException("Cart is empty.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private Orders createOrder(User user, List<Cart> carts) {
+        Orders order = new Orders(user);
+        for (Cart cart : carts) {
+            order.getOrderItems().add(createOrderItem(cart, order));
+            removeCart(cart.getId());
+        }
+        return ordersRepository.save(order);
+    }
+
+    private OrderItem createOrderItem(Cart cart, Orders order) {
+        checkProductAvailability(cart.getProduct(), cart.getQuantity());
+        return new OrderItem(
+                cart.getProduct(),
+                cart.getQuantity(),
+                cart.getSize(),
+                order
+        );
+    }
+
+    private void checkProductAvailability(Product product, int quantity) {
+        Product stock = productService.getProductById(product.getId());
+        if (quantity <= stock.getQuantity()) {
+            stock.setQuantity(stock.getQuantity() - quantity);
+        } else {
+            throw new CustomException("Product does not have enough stock.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public void removeCart(String id) {
+        Cart cart = getCartById(id);
+        cart.getProduct().removeCart(cart);
         cart.getUser().removeCart(cart);
         cartRepository.delete(cart);
-    }
-
-    public Cart removeProduct(Cart cart, Product product) {
-        CartProduct cartProduct = cartProductService.getByCart(cart);
-        if (product.getId().equals(cartProduct.getProduct().getId())) {
-            cartProduct.getCart().removeCartProduct(cartProduct);
-            cartProduct.getProduct().removeCartProduct(cartProduct);
-            cartProductService.deleteCartProduct(cartProduct);
-        }
-        return cart;
-    }
-
-    private void addProducts(Cart cart, Product product, int quantity) {
-        CartProduct cartProduct = new CartProduct();
-        cartProduct.setProduct(product);
-        cartProduct.setCart(cart);
-        cartProduct.setQuantity(quantity);
-        cart.getCartProducts().add(cartProduct);
     }
 }

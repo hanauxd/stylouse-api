@@ -13,7 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 public class ProductRequest {
     private String name;
-    private String size;
     private int quantity;
     private double price;
     private List<String> categories = new ArrayList<>();
@@ -21,7 +20,6 @@ public class ProductRequest {
     public Product getProduct() {
         Product product = new Product();
         product.setName(this.name);
-        product.setSize(this.size);
         product.setQuantity(this.quantity);
         product.setPrice(this.price);
         return product;
@@ -29,7 +27,6 @@ public class ProductRequest {
 
     public Product updateProduct(Product product) {
         product.setName(this.name);
-        product.setSize(this.size);
         product.setQuantity(this.quantity);
         product.setPrice(this.price);
         return product;
