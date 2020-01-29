@@ -1,6 +1,7 @@
 package lk.apiit.eea.stylouse.services;
 
 import lk.apiit.eea.stylouse.dto.request.CartRequest;
+import lk.apiit.eea.stylouse.dto.request.ShippingDetailsRequest;
 import lk.apiit.eea.stylouse.exceptions.CustomException;
 import lk.apiit.eea.stylouse.models.*;
 import lk.apiit.eea.stylouse.repositories.CartRepository;
@@ -63,17 +64,23 @@ public class CartService {
     }
 
     @Transactional
-    public Orders checkout(User user) {
+    public Orders checkout(User user, ShippingDetailsRequest request) {
         List<Cart> carts = getUserCarts(user);
         if (carts.size() > 0) {
-            return createOrder(user, carts);
+            return createOrder(user, carts, request);
         } else {
             throw new CustomException("Cart is empty.", HttpStatus.BAD_REQUEST);
         }
     }
 
-    private Orders createOrder(User user, List<Cart> carts) {
-        Orders order = new Orders(user);
+    private Orders createOrder(User user, List<Cart> carts, ShippingDetailsRequest request) {
+        Orders order = new Orders(
+                user,
+                request.getAddress(),
+                request.getCity(),
+                request.getPostalCode(),
+                request.getPaymentMethod()
+        );
         for (Cart cart : carts) {
             order.getOrderItems().add(createOrderItem(cart, order));
             removeCart(cart.getId());
