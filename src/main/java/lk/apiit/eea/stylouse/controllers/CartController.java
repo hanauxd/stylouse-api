@@ -35,6 +35,14 @@ public class CartController {
     }
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PutMapping("/{id}/{quantity}")
+    public ResponseEntity<?> updateCart(@PathVariable String id, @PathVariable int quantity, Authentication auth) {
+        User user = userService.getUserByEmail(auth.getName());
+        List<Cart> carts = cartService.updateCart(id, quantity, user);
+        return ResponseEntity.ok(carts);
+    }
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCart(@PathVariable String id, Authentication auth) {
         cartService.removeCart(id);

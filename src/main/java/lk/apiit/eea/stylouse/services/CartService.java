@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -46,6 +47,19 @@ public class CartService {
         );
     }
 
+    @Transactional
+    public List<Cart> updateCart(String id, int qty, User user) {
+        Cart cart = getCartById(id);
+        int stock = cart.getProduct().getQuantity();
+        if (qty <= stock) {
+            cart.setQuantity(qty);
+            return getUserCarts(user);
+        } else {
+            throw new CustomException("Requested quantity not available.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Transactional
     public Orders checkout(User user) {
         List<Cart> carts = getUserCarts(user);
         if (carts.size() > 0) {
@@ -65,12 +79,22 @@ public class CartService {
     }
 
     private OrderItem createOrderItem(Cart cart, Orders order) {
+        checkProductAvailability(cart.getProduct(), cart.getQuantity());
         return new OrderItem(
                 cart.getProduct(),
                 cart.getQuantity(),
                 cart.getSize(),
                 order
         );
+    }
+
+    private void checkProductAvailability(Product product, int quantity) {
+        Product stock = productService.getProductById(product.getId());
+        if (quantity <= stock.getQuantity()) {
+            stock.setQuantity(stock.getQuantity() - quantity);
+        } else {
+            throw new CustomException("Product does not have enough stock.", HttpStatus.BAD_REQUEST);
+        }
     }
 
     public void removeCart(String id) {
