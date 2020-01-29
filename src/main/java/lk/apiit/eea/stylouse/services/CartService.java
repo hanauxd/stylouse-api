@@ -49,6 +49,9 @@ public class CartService {
 
     @Transactional
     public List<Cart> updateCart(String id, int qty, User user) {
+        if (qty < 1) {
+            throw new CustomException("The quantity must be at least 1.", HttpStatus.BAD_REQUEST);
+        }
         Cart cart = getCartById(id);
         int stock = cart.getProduct().getQuantity();
         if (qty <= stock) {
