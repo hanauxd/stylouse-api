@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CartRequest {
     private String productId;
+    private String size;
     private int quantity;
 }
