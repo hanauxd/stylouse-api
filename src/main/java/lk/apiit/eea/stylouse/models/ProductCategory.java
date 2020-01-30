@@ -19,12 +19,12 @@ public class ProductCategory {
     @Column(length = 36)
     private String id;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "product", referencedColumnName = "id")
     @JsonIgnore
     private Product product;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "category", referencedColumnName = "id")
     @JsonIgnore
     private Category category;

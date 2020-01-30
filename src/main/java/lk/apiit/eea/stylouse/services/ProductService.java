@@ -18,12 +18,19 @@ public class ProductService {
     private ProductCategoryRepository prodCateRepository;
     private ProductRepository productRepository;
     private CategoryService categoryService;
+    private ProductImageService productImageService;
 
     @Autowired
-    public ProductService(ProductCategoryRepository prodCateRepository, ProductRepository productRepository, CategoryService categoryService) {
+    public ProductService(
+            ProductCategoryRepository prodCateRepository,
+            ProductRepository productRepository,
+            CategoryService categoryService,
+            ProductImageService productImageService
+    ) {
         this.prodCateRepository = prodCateRepository;
         this.productRepository = productRepository;
         this.categoryService = categoryService;
+        this.productImageService = productImageService;
     }
 
     public Product getProductById(String id) {
@@ -50,6 +57,7 @@ public class ProductService {
     }
 
     public void deleteProduct(Product product) {
+        productImageService.deleteProductImages(product);
         productRepository.delete(product);
     }
 
