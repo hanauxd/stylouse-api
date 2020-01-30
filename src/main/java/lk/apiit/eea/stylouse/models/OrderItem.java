@@ -19,12 +19,12 @@ public class OrderItem {
     @Column(length = 36)
     private String id;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "orders", referencedColumnName = "id")
     @JsonIgnore
     private Orders orders;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "product", referencedColumnName = "id")
     @JsonIgnore
     private Product product;

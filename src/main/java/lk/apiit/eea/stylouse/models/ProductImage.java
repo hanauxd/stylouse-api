@@ -21,8 +21,14 @@ public class ProductImage {
 
     private String filename;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "product", referencedColumnName = "id")
     @JsonIgnore
     private Product product;
+
+    public ProductImage(Product product, String filename) {
+        this.product = product;
+        this.filename = filename;
+        this.product.getProductImages().add(this);
+    }
 }
