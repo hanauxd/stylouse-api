@@ -28,19 +28,22 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProductCategory> productCategories = new ArrayList<>();
 
-    public void removeProductCategory(ProductCategory productCategory) {
-        productCategory.setProduct(null);
-        this.productCategories.remove(productCategory);
-    }
-
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Cart> carts = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderItem> orderItems = new ArrayList<>();
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ProductImage> productImages = new ArrayList<>();
+
     public void removeCart(Cart cart) {
         cart.setProduct(null);
         this.carts.remove(cart);
+    }
+
+    public void removeProductCategory(ProductCategory productCategory) {
+        productCategory.setProduct(null);
+        this.productCategories.remove(productCategory);
     }
 }
