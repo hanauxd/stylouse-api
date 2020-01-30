@@ -4,12 +4,14 @@ import lk.apiit.eea.stylouse.dto.request.ProductRequest;
 import lk.apiit.eea.stylouse.models.Category;
 import lk.apiit.eea.stylouse.models.Product;
 import lk.apiit.eea.stylouse.services.CategoryService;
+import lk.apiit.eea.stylouse.services.ProductImageService;
 import lk.apiit.eea.stylouse.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,17 +20,21 @@ import java.util.List;
 public class ProductController {
     private ProductService productService;
     private CategoryService categoryService;
+    private ProductImageService productImageService;
 
     @Autowired
-    public ProductController(ProductService productService, CategoryService categoryService) {
+    public ProductController(ProductService productService, CategoryService categoryService, ProductImageService productImageService) {
         this.productService = productService;
         this.categoryService = categoryService;
+        this.productImageService = productImageService;
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<?> createProduct(@RequestBody ProductRequest request) {
+    public ResponseEntity<?> createProduct(@RequestParam("product") ProductRequest request, @RequestParam("file") MultipartFile[] files) {
+        System.out.println(request.toString());
         Product product = productService.createProduct(request.getProduct(), request.getCategories());
+        productImageService.createProductImage(product, files);
         return new ResponseEntity<>(product, HttpStatus.CREATED);
     }
 
