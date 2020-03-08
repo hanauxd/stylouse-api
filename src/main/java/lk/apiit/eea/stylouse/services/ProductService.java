@@ -33,6 +33,10 @@ public class ProductService {
         this.productImageService = productImageService;
     }
 
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
+    }
+
     public Product getProductById(String id) {
         return productRepository.findById(id).orElseThrow(() -> new CustomException("Product not found.", HttpStatus.NOT_FOUND));
     }

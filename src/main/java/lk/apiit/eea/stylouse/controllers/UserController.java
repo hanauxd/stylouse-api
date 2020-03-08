@@ -5,11 +5,10 @@ import lk.apiit.eea.stylouse.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -22,8 +21,16 @@ public class UserController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/{id}")
+//    @RequestMapping("/users/{id}"
     public ResponseEntity<?> getUserById(@PathVariable String id) {
         User user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @GetMapping
+    public ResponseEntity<?> getLoggedInUser(Authentication auth) {
+        User user = userService.getUserByEmail(auth.getName());
         return ResponseEntity.ok(user);
     }
 }

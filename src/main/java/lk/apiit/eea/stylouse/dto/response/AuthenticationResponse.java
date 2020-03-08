@@ -9,5 +9,5 @@ public class AuthenticationResponse {
     private final String userId;
     private final String tokenValidation;
     private final String jwt;
-
+    private final String userRole;
 }

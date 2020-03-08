@@ -26,7 +26,6 @@ public class ProductCategory {
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "category", referencedColumnName = "id")
-    @JsonIgnore
     private Category category;
 
     public ProductCategory(Product product, Category category) {

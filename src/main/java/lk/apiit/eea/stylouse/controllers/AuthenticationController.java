@@ -6,6 +6,7 @@ import lk.apiit.eea.stylouse.dto.response.AuthenticationResponse;
 import lk.apiit.eea.stylouse.exceptions.CustomException;
 import lk.apiit.eea.stylouse.models.User;
 import lk.apiit.eea.stylouse.security.JwtUtil;
+import lk.apiit.eea.stylouse.security.UserDetailsImpl;
 import lk.apiit.eea.stylouse.security.UserDetailsServiceImpl;
 import lk.apiit.eea.stylouse.services.UserService;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,10 +16,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class AuthenticationController {
     @Value("${app.token.validation}")
@@ -44,9 +47,10 @@ public class AuthenticationController {
     public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) {
         try {
             authManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-            UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
+            UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(request.getUsername());
             String jwt = jwtUtil.generateToken(userDetails);
-            return ResponseEntity.ok(new AuthenticationResponse(userDetails.getUsername(), tokenValidation, jwt));
+            String userRole = userDetails.getUserRole();
+            return ResponseEntity.ok(new AuthenticationResponse(userDetails.getUsername(), tokenValidation, jwt, userRole));
         } catch (BadCredentialsException ex) {
             throw new CustomException("Invalid username or password.", HttpStatus.FORBIDDEN);
         }

@@ -21,12 +21,10 @@ public class Wishlist {
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "user", referencedColumnName = "id")
-    @JsonIgnore
     private User user;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "product", referencedColumnName = "id")
-    @JsonIgnore
     private Product product;
 
     public Wishlist(User user, Product product) {

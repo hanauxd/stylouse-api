@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/categories")
 public class CategoryController {
@@ -23,8 +24,8 @@ public class CategoryController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> createCategory(@RequestBody Category categoryRequest) {
-        Category category = categoryService.createCategory(categoryRequest);
-        return new ResponseEntity<>(category, HttpStatus.CREATED);
+        List<Category> categories = categoryService.createCategory(categoryRequest);
+        return new ResponseEntity<>(categories, HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

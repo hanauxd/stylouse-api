@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/cart")
 public class CartController {
@@ -48,6 +49,14 @@ public class CartController {
     public ResponseEntity<?> deleteCart(@PathVariable String id, Authentication auth) {
         cartService.removeCart(id);
         List<Cart> carts = cartService.getUserCarts(userService.getUserByEmail(auth.getName()));
+        return ResponseEntity.ok(carts);
+    }
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @GetMapping
+    public ResponseEntity<?> getCartByUser(Authentication auth) {
+        User user = userService.getUserByEmail(auth.getName());
+        List<Cart> carts = cartService.getUserCarts(user);
         return ResponseEntity.ok(carts);
     }
 

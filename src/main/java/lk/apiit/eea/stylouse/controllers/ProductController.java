@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/products")
 public class ProductController {
@@ -32,10 +33,15 @@ public class ProductController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestParam("product") ProductRequest request, @RequestParam("file") MultipartFile[] files) {
-        System.out.println(request.toString());
         Product product = productService.createProduct(request.getProduct(), request.getCategories());
         productImageService.createProductImage(product, files);
         return new ResponseEntity<>(product, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllProducts() {
+        List<Product> products = productService.getAllProducts();
+        return ResponseEntity.ok(products);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
@@ -46,7 +52,6 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getProductById(@PathVariable String id) {
         Product product = productService.getProductById(id);
