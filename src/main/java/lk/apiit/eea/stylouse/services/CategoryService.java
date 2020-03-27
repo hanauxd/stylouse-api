@@ -18,10 +18,11 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public Category createCategory(Category category) {
+    public List<Category> createCategory(Category category) {
         boolean isPresent = categoryRepository.findByCategory(category.getCategory()).isPresent();
         if (isPresent) throw new CustomException("Category already exist.", HttpStatus.BAD_REQUEST);
-        return categoryRepository.save(category);
+        categoryRepository.save(category);
+        return getAllCategories();
     }
 
     public Category getCategoryById(String id) {

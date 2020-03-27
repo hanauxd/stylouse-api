@@ -1,5 +1,6 @@
 package lk.apiit.eea.stylouse.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,7 @@ public class Category {
     private String category;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<ProductCategory> productCategories = new ArrayList<>();
 
     public void removeProductCategory(ProductCategory productCategory) {

@@ -29,6 +29,7 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Cart> carts = new ArrayList<>();
 
     public void removeCart(Cart cart) {

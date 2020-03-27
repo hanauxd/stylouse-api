@@ -50,4 +50,8 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public String getUserRole() {
+        return user.getRole();
+    }
 }

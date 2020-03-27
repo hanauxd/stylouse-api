@@ -26,7 +26,6 @@ public class OrderItem {
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "product", referencedColumnName = "id")
-    @JsonIgnore
     private Product product;
 
     private int quantity;

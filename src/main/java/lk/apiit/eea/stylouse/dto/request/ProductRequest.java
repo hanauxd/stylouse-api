@@ -15,6 +15,7 @@ public class ProductRequest {
     private String name;
     private int quantity;
     private double price;
+    private String description;
     private List<String> categories = new ArrayList<>();
 
     public Product getProduct() {
@@ -22,6 +23,7 @@ public class ProductRequest {
         product.setName(this.name);
         product.setQuantity(this.quantity);
         product.setPrice(this.price);
+        product.setDescription(this.description);
         return product;
     }
 
@@ -29,6 +31,7 @@ public class ProductRequest {
         product.setName(this.name);
         product.setQuantity(this.quantity);
         product.setPrice(this.price);
+        product.setDescription(this.description);
         return product;
     }
 }
