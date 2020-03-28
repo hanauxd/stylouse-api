@@ -7,6 +7,7 @@ import lk.apiit.eea.stylouse.services.CategoryService;
 import lk.apiit.eea.stylouse.services.ProductImageService;
 import lk.apiit.eea.stylouse.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -39,8 +40,8 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllProducts() {
-        List<Product> products = productService.getAllProducts();
+    public ResponseEntity<?> getAllProducts(Pageable pageable) {
+        List<Product> products = productService.getAllProducts(pageable);
         return ResponseEntity.ok(products);
     }
 

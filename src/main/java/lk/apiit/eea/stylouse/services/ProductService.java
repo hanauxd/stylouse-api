@@ -7,6 +7,7 @@ import lk.apiit.eea.stylouse.models.ProductCategory;
 import lk.apiit.eea.stylouse.repositories.ProductCategoryRepository;
 import lk.apiit.eea.stylouse.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +34,8 @@ public class ProductService {
         this.productImageService = productImageService;
     }
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<Product> getAllProducts(Pageable pageable) {
+        return productRepository.findAll(pageable).getContent();
     }
 
     public Product getProductById(String id) {
