@@ -29,6 +29,7 @@ public class Product {
     private double price;
     private String description;
     @CreationTimestamp
+    @JsonIgnore
     private Date createdAt;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -5,6 +5,7 @@ import lk.apiit.eea.stylouse.models.User;
 import lk.apiit.eea.stylouse.services.OrdersService;
 import lk.apiit.eea.stylouse.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -27,9 +28,9 @@ public class OrdersController {
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping
-    public ResponseEntity<?> getUserOrders(Authentication auth) {
+    public ResponseEntity<?> getUserOrders(Authentication auth, Pageable pageable) {
         User user = userService.getUserByEmail(auth.getName());
-        List<Orders> orders = ordersService.getUserOrders(user);
+        List<Orders> orders = ordersService.getUserOrders(user, pageable);
         return ResponseEntity.ok(orders);
     }
 
