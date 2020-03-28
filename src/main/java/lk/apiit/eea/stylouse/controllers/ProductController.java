@@ -60,11 +60,11 @@ public class ProductController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}")
+    @PostMapping("/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable String id, @RequestBody ProductRequest request) {
         Product persistedProduct = productService.getProductById(id);
         Product product = request.updateProduct(persistedProduct);
-        Product updatedProduct = productService.updateProduct(product, request.getCategories());
+        Product updatedProduct = productService.updateProduct(product);
         return ResponseEntity.ok(updatedProduct);
     }
 
