@@ -33,7 +33,7 @@ public class Orders {
     @JsonIgnore
     private User user;
 
-    @JsonFormat(pattern = "dd-MM-yyyy hh:MM")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date date;
 
     @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

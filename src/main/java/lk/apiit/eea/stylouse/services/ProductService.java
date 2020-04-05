@@ -56,8 +56,7 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public Product updateProduct(Product product, List<String> categories) {
-        addCategories(product, categories);
+    public Product updateProduct(Product product) {
         return productRepository.save(product);
     }
 
