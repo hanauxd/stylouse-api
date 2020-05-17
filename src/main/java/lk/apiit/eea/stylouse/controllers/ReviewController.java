@@ -51,7 +51,7 @@ public class ReviewController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteReview(@PathVariable String id, Pageable pageable) {
-        return ResponseEntity.ok(reviewService.deleteReview(id, pageable));
+    public ResponseEntity<?> deleteReview(@PathVariable String id) {
+        return ResponseEntity.ok(reviewService.deleteReview(id));
     }
 }
