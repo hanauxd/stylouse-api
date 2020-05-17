@@ -42,11 +42,13 @@ public class ReviewService {
         return new ReviewResponse(reviews);
     }
 
-    public ReviewResponse deleteReview(String reviewId, Pageable pageable) {
+    public ReviewResponse deleteReview(String reviewId) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new CustomException("Review not found", HttpStatus.BAD_REQUEST));
         String reviewProductId = review.getProduct().getId();
         reviewRepository.delete(review);
-        return getReviewsForProduct(reviewProductId, pageable);
+        Product product = productService.getProductById(reviewProductId);
+        List<Review> reviews = reviewRepository.findAllByProductOrderByDateDesc(product);
+        return new ReviewResponse(reviews);
     }
 
     public Review getReviewByUserAndProduct(User user, Product product) {
