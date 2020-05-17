@@ -14,4 +14,6 @@ public interface ReviewRepository extends JpaRepository<Review, String> {
     List<Review> findAllByProduct(Product product, Pageable pageable);
 
     Review findByUserAndProduct(User user, Product product);
+
+    List<Review> findAllByProductOrderByDateDesc(Product product);
 }
