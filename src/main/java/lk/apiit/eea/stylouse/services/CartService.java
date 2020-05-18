@@ -15,15 +15,17 @@ import java.util.List;
 
 @Service
 public class CartService {
-    private CartRepository cartRepository;
-    private ProductService productService;
-    private OrdersRepository ordersRepository;
+    private final CartRepository cartRepository;
+    private final ProductService productService;
+    private final OrdersRepository ordersRepository;
+    private final MailService mailService;
 
     @Autowired
-    public CartService(CartRepository cartRepository, ProductService productService, OrdersRepository ordersRepository) {
+    public CartService(CartRepository cartRepository, ProductService productService, OrdersRepository ordersRepository, MailService mailService) {
         this.cartRepository = cartRepository;
         this.productService = productService;
         this.ordersRepository = ordersRepository;
+        this.mailService = mailService;
     }
 
     public List<Cart> createOrUpdateCart(User user, CartRequest request) {
@@ -85,6 +87,7 @@ public class CartService {
             order.getOrderItems().add(createOrderItem(cart, order));
             removeCart(cart.getId());
         }
+        new Thread(() -> mailService.sendMailWithAttachment(user, order)).start();
         return ordersRepository.save(order);
     }
 
