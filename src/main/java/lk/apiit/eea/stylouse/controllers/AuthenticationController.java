@@ -55,7 +55,7 @@ public class AuthenticationController {
         }
     }
 
-    @PostMapping({"/register"})
+    @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserRequest request) {
         User user = userService.createUser(request.getUser());
         return new ResponseEntity<>(user, HttpStatus.CREATED);
@@ -66,5 +66,17 @@ public class AuthenticationController {
         User user = userService.getUserByEmail(email);
         resetPasswordService.createResetPasswordToken(user);
         return ResponseEntity.ok("Reset password requested.");
+    }
+
+    @PostMapping("/reset-password-confirmation")
+    public ResponseEntity<?> resetPasswordConfirmation(@RequestBody AuthenticationRequest request) {
+        String token = request.getPassword();
+        return ResponseEntity.ok(resetPasswordService.confirmPasswordReset(request.getUsername(), token));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody AuthenticationRequest authRequest) {
+        resetPasswordService.resetPassword(authRequest);
+        return login(authRequest);
     }
 }
