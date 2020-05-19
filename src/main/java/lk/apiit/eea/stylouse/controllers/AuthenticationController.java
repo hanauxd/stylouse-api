@@ -8,6 +8,7 @@ import lk.apiit.eea.stylouse.models.User;
 import lk.apiit.eea.stylouse.security.JwtUtil;
 import lk.apiit.eea.stylouse.security.UserDetailsImpl;
 import lk.apiit.eea.stylouse.security.UserDetailsServiceImpl;
+import lk.apiit.eea.stylouse.services.ResetPasswordService;
 import lk.apiit.eea.stylouse.services.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -15,31 +16,30 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*")
 @RestController
 public class AuthenticationController {
     @Value("${app.token.validation}")
     private String tokenValidation;
-    private UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationManager authManager;
-    private JwtUtil jwtUtil;
-    private UserService userService;
+    private final JwtUtil jwtUtil;
+    private final UserService userService;
+    private final ResetPasswordService resetPasswordService;
 
     public AuthenticationController(
             UserDetailsServiceImpl userDetailsService,
             AuthenticationManager authManager,
             JwtUtil jwtUtil,
-            UserService userService
-    ) {
+            UserService userService,
+            ResetPasswordService resetPasswordService) {
         this.userDetailsService = userDetailsService;
         this.authManager = authManager;
         this.jwtUtil = jwtUtil;
         this.userService = userService;
+        this.resetPasswordService = resetPasswordService;
     }
 
     @PostMapping("/login")
@@ -59,5 +59,12 @@ public class AuthenticationController {
     public ResponseEntity<?> register(@RequestBody UserRequest request) {
         User user = userService.createUser(request.getUser());
         return new ResponseEntity<>(user, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/reset-password-request")
+    public ResponseEntity<?> resetPassword(@RequestParam String email) {
+        User user = userService.getUserByEmail(email);
+        resetPasswordService.createResetPasswordToken(user);
+        return ResponseEntity.ok("Reset password requested.");
     }
 }
