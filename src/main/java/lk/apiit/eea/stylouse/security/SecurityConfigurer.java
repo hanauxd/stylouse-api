@@ -36,7 +36,8 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                         "/products/**",
                         "/products",
                         "/reviews/product/**",
-                        "/reset-password-request"
+                        "/reset-password-request",
+                        "/reset-password-confirmation"
                 ).permitAll()
                 .anyRequest().authenticated()
                 .and().sessionManagement()
