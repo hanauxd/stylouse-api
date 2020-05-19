@@ -11,14 +11,11 @@ import java.util.Date;
 public class PasswordTokenValidationService {
 
     public void validateToken(ResetPasswordToken persistedToken, String token) {
-        if (persistedToken == null) {
-            throw new CustomException("Token not found.", HttpStatus.NOT_FOUND);
+        if (persistedToken == null || !isTokenMatched(persistedToken.getToken(), token)) {
+            throw new CustomException("Invalid token.", HttpStatus.BAD_REQUEST);
         }
         if (isTokenExpired(persistedToken)) {
             throw new CustomException("Token is expired.", HttpStatus.BAD_REQUEST);
-        }
-        if (!isTokenMatched(persistedToken.getToken(), token)) {
-            throw new CustomException("Invalid token.", HttpStatus.BAD_REQUEST);
         }
     }
 
