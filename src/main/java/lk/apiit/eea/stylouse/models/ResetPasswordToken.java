@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -16,9 +15,6 @@ import java.util.Random;
 @Entity
 @Table(name = "reset_password_token")
 public class ResetPasswordToken {
-    @Value("${password.token.expiration}")
-    long expireIn;
-
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
@@ -33,11 +29,11 @@ public class ResetPasswordToken {
 
     private Date expiryDate;
 
-    private boolean isUsed;
+    private long expireIn;
 
-    public ResetPasswordToken(User user) {
+    public ResetPasswordToken(User user, long expireIn) {
         this.user = user;
-        this.expiryDate = new Date(System.currentTimeMillis() + expireIn);
+        this.expiryDate = new Date(new Date().getTime()+expireIn);
         this.token = String.valueOf(new Random().nextInt(1000000) + 100000);
     }
 }
