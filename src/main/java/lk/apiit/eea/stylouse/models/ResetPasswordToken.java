@@ -34,6 +34,6 @@ public class ResetPasswordToken {
     public ResetPasswordToken(User user, long expireIn) {
         this.user = user;
         this.expiryDate = new Date(new Date().getTime()+expireIn);
-        this.token = String.valueOf(new Random().nextInt(1000000) + 100000);
+        this.token = String.valueOf(new Random().nextInt(899999) + 100000);
     }
 }
