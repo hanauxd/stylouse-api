@@ -18,6 +18,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @CrossOrigin(origins = "*")
 @RestController
 public class AuthenticationController {
@@ -62,10 +65,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/reset-password-request")
-    public ResponseEntity<?> resetPassword(@RequestParam String email) {
+    public ResponseEntity<?> resetPasswordRequest(@RequestParam String email) {
         User user = userService.getUserByEmail(email);
         resetPasswordService.createResetPasswordToken(user);
-        return ResponseEntity.ok("Reset password requested.");
+        Map<String, String> responseMap = new HashMap<>();
+        responseMap.put("message", "Reset password requested.");
+        return ResponseEntity.ok(responseMap);
     }
 
     @PostMapping("/reset-password-confirmation")
