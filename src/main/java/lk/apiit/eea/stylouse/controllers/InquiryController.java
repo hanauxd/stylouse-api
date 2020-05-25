@@ -4,7 +4,6 @@ import lk.apiit.eea.stylouse.dto.request.InquiryRequest;
 import lk.apiit.eea.stylouse.dto.response.InquiryResponse;
 import lk.apiit.eea.stylouse.models.Inquiry;
 import lk.apiit.eea.stylouse.models.Product;
-import lk.apiit.eea.stylouse.models.Reply;
 import lk.apiit.eea.stylouse.models.User;
 import lk.apiit.eea.stylouse.services.InquiryService;
 import lk.apiit.eea.stylouse.services.ProductService;
@@ -43,12 +42,12 @@ public class InquiryController {
         Product product = productService.getProductById(request.getProductIdOrInquiryId());
         Inquiry existingInquiry = inquiryService.getInquiryByUserAndProduct(user, product);
         if (existingInquiry != null) {
-            Reply reply = replyService.createReply(request, user, existingInquiry);
-            return new ResponseEntity<>(reply, HttpStatus.CREATED);
+            replyService.createReply(request, user, existingInquiry);
         } else {
-            Inquiry inquiry = inquiryService.createInquiry(request, user, product);
-            return new ResponseEntity<>(inquiry, HttpStatus.CREATED);
+            inquiryService.createInquiry(request, user, product);
         }
+        List<Inquiry> inquiries = inquiryService.getInquiryByProduct(product);
+        return new ResponseEntity<>(new InquiryResponse(inquiries), HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
@@ -63,6 +62,14 @@ public class InquiryController {
     @GetMapping("/all")
     public ResponseEntity<?> getAllInquiries() {
         List<Inquiry> inquiries = inquiryService.getAllInquiries();
+        return ResponseEntity.ok(new InquiryResponse(inquiries));
+    }
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @GetMapping("/product/{id}")
+    public ResponseEntity<?> getInquiryByProduct(@PathVariable String id) {
+        Product product = productService.getProductById(id);
+        List<Inquiry> inquiries = inquiryService.getInquiryByProduct(product);
         return ResponseEntity.ok(new InquiryResponse(inquiries));
     }
 }
