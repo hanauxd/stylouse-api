@@ -21,16 +21,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.springframework.http.ResponseEntity.ok;
+
 @CrossOrigin(origins = "*")
 @RestController
 public class AuthenticationController {
-    @Value("${app.token.validation}")
-    private String tokenValidation;
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationManager authManager;
     private final JwtUtil jwtUtil;
     private final UserService userService;
     private final ResetPasswordService resetPasswordService;
+    @Value("${app.token.validation}")
+    private String tokenValidation;
 
     public AuthenticationController(
             UserDetailsServiceImpl userDetailsService,
@@ -49,10 +51,7 @@ public class AuthenticationController {
     public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) {
         try {
             authManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-            UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(request.getUsername());
-            String jwt = jwtUtil.generateToken(userDetails);
-            String userRole = userDetails.getUserRole();
-            return ResponseEntity.ok(new AuthenticationResponse(userDetails.getUsername(), tokenValidation, jwt, userRole));
+            return ok(authToken(request.getUsername()));
         } catch (BadCredentialsException ex) {
             throw new CustomException("Invalid username or password.", HttpStatus.FORBIDDEN);
         }
@@ -61,7 +60,7 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserRequest request) {
         User user = userService.createUser(request.getUser());
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        return ok(authToken(user.getEmail()));
     }
 
     @PostMapping("/reset-password-request")
@@ -70,18 +69,25 @@ public class AuthenticationController {
         resetPasswordService.createResetPasswordToken(user);
         Map<String, String> responseMap = new HashMap<>();
         responseMap.put("message", "Reset password requested.");
-        return ResponseEntity.ok(responseMap);
+        return ok(responseMap);
     }
 
     @PostMapping("/reset-password-confirmation")
     public ResponseEntity<?> resetPasswordConfirmation(@RequestBody AuthenticationRequest request) {
         String token = request.getPassword();
-        return ResponseEntity.ok(resetPasswordService.confirmPasswordReset(request.getUsername(), token));
+        return ok(resetPasswordService.confirmPasswordReset(request.getUsername(), token));
     }
 
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody AuthenticationRequest authRequest) {
         resetPasswordService.resetPassword(authRequest);
         return login(authRequest);
+    }
+
+    private AuthenticationResponse authToken(String email) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(email);
+        String jwt = jwtUtil.generateToken(userDetails);
+        String userRole = userDetails.getUserRole();
+        return new AuthenticationResponse(userDetails.getUsername(), tokenValidation, jwt, userRole);
     }
 }
