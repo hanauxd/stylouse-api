@@ -44,4 +44,8 @@ public class InquiryService {
     public List<Inquiry> getAllInquiries() {
         return inquiryRepository.findAll();
     }
+
+    public List<Inquiry> getInquiryByProduct(Product product) {
+        return inquiryRepository.findByProduct(product);
+    }
 }

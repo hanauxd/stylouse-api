@@ -33,7 +33,7 @@ public class Reply {
     private User user;
 
     @CreationTimestamp
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="IST")
     private Date date;
 
     private String message;

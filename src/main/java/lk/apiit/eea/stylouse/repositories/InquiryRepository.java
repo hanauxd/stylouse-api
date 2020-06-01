@@ -13,4 +13,6 @@ public interface InquiryRepository extends JpaRepository<Inquiry, String> {
     Inquiry findByUserAndProduct(User user, Product product);
 
     List<Inquiry> findByUser(User user);
+
+    List<Inquiry> findByProduct(Product product);
 }

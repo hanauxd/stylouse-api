@@ -3,6 +3,7 @@ package lk.apiit.eea.stylouse.services;
 import lk.apiit.eea.stylouse.dto.request.CartRequest;
 import lk.apiit.eea.stylouse.dto.request.ShippingDetailsRequest;
 import lk.apiit.eea.stylouse.exceptions.CustomException;
+import lk.apiit.eea.stylouse.mail.OrdersMailService;
 import lk.apiit.eea.stylouse.models.*;
 import lk.apiit.eea.stylouse.repositories.CartRepository;
 import lk.apiit.eea.stylouse.repositories.OrdersRepository;
@@ -18,10 +19,14 @@ public class CartService {
     private final CartRepository cartRepository;
     private final ProductService productService;
     private final OrdersRepository ordersRepository;
-    private final MailService mailService;
+    private final OrdersMailService mailService;
 
     @Autowired
-    public CartService(CartRepository cartRepository, ProductService productService, OrdersRepository ordersRepository, MailService mailService) {
+    public CartService(
+            CartRepository cartRepository,
+            ProductService productService,
+            OrdersRepository ordersRepository,
+            OrdersMailService mailService) {
         this.cartRepository = cartRepository;
         this.productService = productService;
         this.ordersRepository = ordersRepository;
@@ -87,7 +92,7 @@ public class CartService {
             order.getOrderItems().add(createOrderItem(cart, order));
             removeCart(cart.getId());
         }
-        new Thread(() -> mailService.sendMailWithAttachment(user, order)).start();
+        new Thread(() -> mailService.sendMail(user, "Order Confirmation", order)).start();
         return ordersRepository.save(order);
     }
 

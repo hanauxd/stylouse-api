@@ -39,7 +39,7 @@ public class ReplyController {
     public ResponseEntity<?> createReply(@RequestBody InquiryRequest request, Authentication auth) {
         Inquiry inquiry = inquiryService.getInquiryById(request.getProductIdOrInquiryId());
         User user = userService.getUserByEmail(auth.getName());
-        Reply reply = replyService.createReply(request, user, inquiry);
+        replyService.createReply(request, user, inquiry);
         Inquiry updatedInquiry = inquiryService.getInquiryById(inquiry.getId());
         return new ResponseEntity<>(updatedInquiry, HttpStatus.CREATED);
     }
