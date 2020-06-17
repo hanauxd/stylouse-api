@@ -3,9 +3,9 @@ package lk.apiit.eea.stylouse.services;
 import lk.apiit.eea.stylouse.dto.request.CartRequest;
 import lk.apiit.eea.stylouse.dto.request.ShippingDetailsRequest;
 import lk.apiit.eea.stylouse.exceptions.CustomException;
+import lk.apiit.eea.stylouse.mail.OrdersMailService;
 import lk.apiit.eea.stylouse.models.*;
 import lk.apiit.eea.stylouse.repositories.CartRepository;
-import lk.apiit.eea.stylouse.repositories.OrdersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -15,15 +15,21 @@ import java.util.List;
 
 @Service
 public class CartService {
-    private CartRepository cartRepository;
-    private ProductService productService;
-    private OrdersRepository ordersRepository;
+    private final CartRepository cartRepository;
+    private final ProductService productService;
+    private final OrdersService ordersService;
+    private final OrdersMailService mailService;
 
     @Autowired
-    public CartService(CartRepository cartRepository, ProductService productService, OrdersRepository ordersRepository) {
+    public CartService(
+            CartRepository cartRepository,
+            ProductService productService,
+            OrdersService ordersService,
+            OrdersMailService mailService) {
         this.cartRepository = cartRepository;
         this.productService = productService;
-        this.ordersRepository = ordersRepository;
+        this.ordersService = ordersService;
+        this.mailService = mailService;
     }
 
     public List<Cart> createOrUpdateCart(User user, CartRequest request) {
@@ -85,7 +91,8 @@ public class CartService {
             order.getOrderItems().add(createOrderItem(cart, order));
             removeCart(cart.getId());
         }
-        return ordersRepository.save(order);
+        new Thread(() -> mailService.sendMail(user, "Order Confirmation", order)).start();
+        return ordersService.createOrder(order);
     }
 
     private OrderItem createOrderItem(Cart cart, Orders order) {

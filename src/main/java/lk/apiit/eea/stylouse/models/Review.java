@@ -1,19 +1,20 @@
 package lk.apiit.eea.stylouse.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Cart {
+@Table(name = "review")
+public class Review {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
@@ -28,19 +29,17 @@ public class Cart {
     @JoinColumn(name = "product", referencedColumnName = "id")
     private Product product;
 
-    private int quantity;
+    @CreationTimestamp
+    private Date date;
 
-    private String size;
+    private String message;
 
-    public Cart(User user, Product product, int quantity, String size) {
+    private int rate;
+
+    public Review(User user, Product product, String message, int rate) {
         this.user = user;
         this.product = product;
-        this.quantity = quantity;
-        this.size = size;
-    }
-
-    @Transient
-    public double getTotalPrice() {
-        return quantity * product.getPrice();
+        this.message = message;
+        this.rate = rate;
     }
 }

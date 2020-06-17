@@ -6,28 +6,34 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
+import java.util.Random;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
-public class Wishlist {
+@Table(name = "reset_password_token")
+public class ResetPasswordToken {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(length = 36)
     private String id;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "user", referencedColumnName = "id")
     private User user;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-    @JoinColumn(name = "product", referencedColumnName = "id")
-    private Product product;
+    private String token;
 
-    public Wishlist(User user, Product product) {
+    private Date expiryDate;
+
+    private long expireIn;
+
+    public ResetPasswordToken(User user, long expireIn) {
         this.user = user;
-        this.product = product;
+        this.expiryDate = new Date(new Date().getTime()+expireIn);
+        this.token = String.valueOf(new Random().nextInt(899999) + 100000);
     }
 }

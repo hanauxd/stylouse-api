@@ -16,8 +16,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
-    private JwtRequestFilter jwtRequestFilter;
-    private UserDetailsServiceImpl userDetailsService;
+    private final JwtRequestFilter jwtRequestFilter;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     public SecurityConfigurer(JwtRequestFilter jwtRequestFilter, UserDetailsServiceImpl userDetailsService) {
@@ -29,7 +29,16 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/login", "/register", "/product/images/download/**", "/products/**", "/products").permitAll()
+                .antMatchers(
+                        "/login",
+                        "/register",
+                        "/product/images/download/**",
+                        "/products/**",
+                        "/products",
+                        "/reviews/product/**",
+                        "/reset-password-request",
+                        "/reset-password-confirmation"
+                ).permitAll()
                 .anyRequest().authenticated()
                 .and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
