@@ -37,7 +37,7 @@ abstract class MailService {
         LOGGER.debug("Mail sent successfully.");
     }
 
-    protected MimeMessage createMimeMessage(User user, String subject, Object model) {
+    private MimeMessage createMimeMessage(User user, String subject, Object model) {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(sender.createMimeMessage(), true);
             helper.setTo(user.getEmail());

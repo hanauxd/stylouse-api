@@ -13,7 +13,7 @@ import java.util.List;
 
 @Service
 public class OrdersService {
-    private OrdersRepository ordersRepository;
+    private final OrdersRepository ordersRepository;
 
     @Autowired
     public OrdersService(OrdersRepository ordersRepository) {
@@ -28,5 +28,9 @@ public class OrdersService {
         return ordersRepository.findById(id).orElseThrow(
                 () -> new CustomException("Order not found", HttpStatus.NOT_FOUND)
         );
+    }
+
+    public Orders createOrder(Orders orders) {
+        return ordersRepository.save(orders);
     }
 }

@@ -6,7 +6,6 @@ import lk.apiit.eea.stylouse.exceptions.CustomException;
 import lk.apiit.eea.stylouse.mail.OrdersMailService;
 import lk.apiit.eea.stylouse.models.*;
 import lk.apiit.eea.stylouse.repositories.CartRepository;
-import lk.apiit.eea.stylouse.repositories.OrdersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,18 +17,18 @@ import java.util.List;
 public class CartService {
     private final CartRepository cartRepository;
     private final ProductService productService;
-    private final OrdersRepository ordersRepository;
+    private final OrdersService ordersService;
     private final OrdersMailService mailService;
 
     @Autowired
     public CartService(
             CartRepository cartRepository,
             ProductService productService,
-            OrdersRepository ordersRepository,
+            OrdersService ordersService,
             OrdersMailService mailService) {
         this.cartRepository = cartRepository;
         this.productService = productService;
-        this.ordersRepository = ordersRepository;
+        this.ordersService = ordersService;
         this.mailService = mailService;
     }
 
@@ -93,7 +92,7 @@ public class CartService {
             removeCart(cart.getId());
         }
         new Thread(() -> mailService.sendMail(user, "Order Confirmation", order)).start();
-        return ordersRepository.save(order);
+        return ordersService.createOrder(order);
     }
 
     private OrderItem createOrderItem(Cart cart, Orders order) {
